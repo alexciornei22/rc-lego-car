@@ -11,9 +11,6 @@ static int _usart0_putchar(char c, FILE *stream);
 static FILE USART0_stdout = FDEV_SETUP_STREAM(
     _usart0_putchar, NULL, _FDEV_SETUP_WRITE);
 
-/*
- * Initialize the USART peripheral.
- */
 void USART0_init(unsigned int ubrr)
 {
     /* baud rate registers */
@@ -27,17 +24,11 @@ void USART0_init(unsigned int ubrr)
     UCSR0C = (1<<USBS0) | (3<<UCSZ00);
 }
 
-/** Replaces the default stdout with our USART implementation. */
 void USART0_use_stdio(void)
 {
     stdout = &USART0_stdout;
 }
 
-/*
- * Transmit a byte through the USART.
- *
- * @param `data`: the character to send
- */
 void USART0_transmit(char data)
 {
     /* wait until buffer is empty */
@@ -47,11 +38,6 @@ void USART0_transmit(char data)
     UDR0 = data;
 }
 
-/*
- * Receives a byte from USART.
- *
- * @return the data byte received;
- */
 char USART0_receive()
 {
     /* busy wait until reception is complete */
@@ -61,11 +47,18 @@ char USART0_receive()
     return UDR0;
 }
 
-/*
- * Trasmits a null-terminated string through the USART.
- *
- * @param str: the string to send
- */
+void USART0_receive_until_newline(char *buffer)
+{
+    char c;
+    do {
+        c = USART0_receive();
+        *buffer = c;
+        buffer++;
+    } while (c != '\n');
+    
+    *buffer = '\0';
+}
+
 void USART0_print(const char *str)
 {
     while (*str != '\0') {
@@ -73,7 +66,6 @@ void USART0_print(const char *str)
     }
 }
 
-/* Stream's putchar() implementation to send a byte using USART0 */
 static int _usart0_putchar(char c, FILE *stream)
 {
     if (c == '\n')  /* convert '\n' to CRLF */

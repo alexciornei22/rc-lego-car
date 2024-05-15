@@ -12,6 +12,11 @@ int main()
 	USART0_init(CALC_USART_UBRR(BAUD_RATE));
 	Timer0_init_pwm();
 
+	USART0_print("AT+NAMELEGO-CAR\r\n");
+	USART0_print("AT+NLLEGO-CAR\r\n");
+
+	char buffer[30];
+
 	while (1) {
 		_delay_ms(200);
 
@@ -20,6 +25,9 @@ int main()
 		} else {
 			OCR0A = 0;
 		}
+		
+		USART0_receive_until_newline(buffer);
+		USART0_print(buffer);
 	}
 
 	return 0;

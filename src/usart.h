@@ -30,6 +30,13 @@ void USART0_transmit(char data);
 char USART0_receive();
 
 /*
+ * Receives a line from USART.
+ *
+ * @return the data byte received;
+ */
+void USART0_receive_until_newline(char *buffer);
+
+/*
  * Trasmits a null-terminated string through the USART.
  *
  * @param str: the string to send
