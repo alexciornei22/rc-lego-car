@@ -4,6 +4,7 @@
 #include "timers.h"
 
 volatile uint16_t millis = 0;
+volatile uint16_t ultrasonic_sensor_micros = 0;
 
 void Timer0_init_pwm()
 {
@@ -24,9 +25,36 @@ void Timer0_init_pwm()
     OCR0A = 127;
 }
 
-void Timer2_init_1000hz()
+void Timer1_init_input_capture()
 {
     cli();
+
+    // OC1A/OC0B disconnected, normal mode
+    TCCR1A = 0;
+
+    // set input capture noise canceler
+    TCCR1B |= _BV(ICNC1);
+    // set falling edge trigger
+    TCCR1B &= ~_BV(ICES1);
+
+    // set 8 prescaler
+    TCCR1B |= _BV(CS11);
+
+    // set input capture interrupt
+    TIMSK1 |= _BV(ICIE1);
+    
+    sei();
+}
+
+ISR(TIMER1_CAPT_vect)
+{
+    ultrasonic_sensor_micros = ICR1 / 2;
+}
+
+void Timer2_init_1Khz()
+{
+    cli();
+
     // set CTC mode
     TCCR2A |= _BV(WGM21);
 
@@ -44,5 +72,5 @@ void Timer2_init_1000hz()
 
 ISR(TIMER2_COMPA_vect)
 {
-    millis ++;
+    millis++;
 }

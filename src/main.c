@@ -7,18 +7,25 @@
 #include "timers.h"
 #include "leds.h"
 #include "adc.h"
+#include "ultrasonic_sensor.h"
 
 #define BAUD_RATE 9600
 
 extern volatile uint16_t millis;
+
 bool light_low = false;
 
 int main()
 {
 	// Initialize USART
 	USART0_init(CALC_USART_UBRR(BAUD_RATE));
+
+	ultrasonic_sensor_init_gpio();
+
 	Timer0_init_pwm();
-	Timer2_init_1000hz();
+	Timer1_init_input_capture();
+	Timer2_init_1Khz();
+
 	init_bluetooth_conn_led();
 	adc_init();
 
@@ -28,11 +35,18 @@ int main()
 	char usart_buffer[30];
 
 	while (1) {
-		if (millis >= 1000) {
+		if (millis >= 250) {
 			millis = 0;
 			
 			uint16_t result = adc_get_light_value();
-			sprintf(usart_buffer, "%u %u\r\n", result, millis);
+			// sprintf(usart_buffer, "%u %u\r\n", result, millis);
+			// USART0_print(usart_buffer);
+
+			ultrasonic_sensor_trigger();
+
+			uint16_t distance = ultrasonic_sensor_get_distance();
+
+			sprintf(usart_buffer, "%u\r\n", distance);
 			USART0_print(usart_buffer);
 		}
 	}
