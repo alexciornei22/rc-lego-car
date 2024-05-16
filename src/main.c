@@ -3,6 +3,7 @@
 
 #include "usart.h"
 #include "timers.h"
+#include "leds.h"
 
 #define BAUD_RATE 9600
 
@@ -11,11 +12,12 @@ int main()
 	// Initialize USART
 	USART0_init(CALC_USART_UBRR(BAUD_RATE));
 	Timer0_init_pwm();
-
+	init_bluetooth_conn_led();
+	
 	USART0_print("AT+NAMELEGO-CAR\r\n");
 	USART0_print("AT+NLLEGO-CAR\r\n");
 
-	char buffer[30];
+	char usart_buffer[30];
 
 	while (1) {
 		_delay_ms(200);
@@ -26,8 +28,11 @@ int main()
 			OCR0A = 0;
 		}
 		
-		USART0_receive_until_newline(buffer);
-		USART0_print(buffer);
+		if (UCSR0A & _BV(RXC0)) {
+			USART0_receive_until_newline(usart_buffer);
+
+			PORTC ^= _BV(PC3);
+		}
 	}
 
 	return 0;

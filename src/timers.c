@@ -20,5 +20,5 @@ void Timer0_init_pwm()
     TCCR0B |= _BV(CS00);
     TCCR0B |= _BV(CS02);
 
-    OCR0A = 0;
+    OCR0A = 127;
 }

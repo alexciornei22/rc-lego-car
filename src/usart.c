@@ -3,14 +3,6 @@
 
 #include "usart.h"
 
-/*
- * Define a custom stream for UART output (e.g., for direct printf() usage):
- * @see https://www.nongnu.org/avr-libc/user-manual/group__avr__stdio.html
- */
-static int _usart0_putchar(char c, FILE *stream);
-static FILE USART0_stdout = FDEV_SETUP_STREAM(
-    _usart0_putchar, NULL, _FDEV_SETUP_WRITE);
-
 void USART0_init(unsigned int ubrr)
 {
     /* baud rate registers */
@@ -22,11 +14,6 @@ void USART0_init(unsigned int ubrr)
 
     /* frame format: 8 bits, 2 stop, no parity */
     UCSR0C = (1<<USBS0) | (3<<UCSZ00);
-}
-
-void USART0_use_stdio(void)
-{
-    stdout = &USART0_stdout;
 }
 
 void USART0_transmit(char data)
@@ -64,12 +51,4 @@ void USART0_print(const char *str)
     while (*str != '\0') {
         USART0_transmit(*str++);
     }
-}
-
-static int _usart0_putchar(char c, FILE *stream)
-{
-    if (c == '\n')  /* convert '\n' to CRLF */
-        _usart0_putchar('\r', stream);
-    USART0_transmit(c);
-    return 0;
 }

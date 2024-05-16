@@ -32,7 +32,7 @@ char USART0_receive();
 /*
  * Receives a line from USART.
  *
- * @return the data byte received;
+ * @return the data received;
  */
 void USART0_receive_until_newline(char *buffer);
 
