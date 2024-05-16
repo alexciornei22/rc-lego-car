@@ -1,13 +1,12 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-#include <util/delay.h>
-
 #include "usart.h"
 #include "timers.h"
 #include "leds.h"
 #include "adc.h"
 #include "ultrasonic_sensor.h"
+#include "buzzer.h"
 
 #define BAUD_RATE 9600
 
@@ -21,6 +20,7 @@ int main()
 	USART0_init(CALC_USART_UBRR(BAUD_RATE));
 
 	ultrasonic_sensor_init_gpio();
+	buzzer_init_gpio();
 
 	Timer0_init_pwm();
 	Timer1_init_input_capture();
@@ -35,16 +35,20 @@ int main()
 	char usart_buffer[30];
 
 	while (1) {
+
+		buzzer_use();
+	
 		if (millis >= 250) {
 			millis = 0;
 			
-			uint16_t result = adc_get_light_value();
+			// uint16_t result = adc_get_light_value();
 			// sprintf(usart_buffer, "%u %u\r\n", result, millis);
 			// USART0_print(usart_buffer);
 
 			ultrasonic_sensor_trigger();
 
 			uint16_t distance = ultrasonic_sensor_get_distance();
+			buzzer_update_frequency_for_distance(distance);
 
 			sprintf(usart_buffer, "%u\r\n", distance);
 			USART0_print(usart_buffer);

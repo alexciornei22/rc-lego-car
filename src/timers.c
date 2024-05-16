@@ -4,6 +4,7 @@
 #include "timers.h"
 
 volatile uint16_t millis = 0;
+volatile uint16_t buzzer_millis = 0;
 volatile uint16_t ultrasonic_sensor_micros = 0;
 
 void Timer0_init_pwm()
@@ -73,4 +74,5 @@ void Timer2_init_1Khz()
 ISR(TIMER2_COMPA_vect)
 {
     millis++;
+    buzzer_millis++;
 }
