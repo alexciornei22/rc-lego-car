@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
@@ -6,6 +7,7 @@
 volatile uint16_t millis = 0;
 volatile uint16_t buzzer_millis = 0;
 volatile uint16_t ultrasonic_sensor_micros = 0;
+volatile bool distance_updated = false;
 
 void Timer0_init_pwm()
 {
@@ -50,6 +52,7 @@ void Timer1_init_input_capture()
 ISR(TIMER1_CAPT_vect)
 {
     ultrasonic_sensor_micros = ICR1 / 2;
+    distance_updated = true;
 }
 
 void Timer2_init_1Khz()

@@ -37,7 +37,13 @@ int main()
 	while (1) {
 
 		buzzer_use();
-	
+
+		if (ultrasonic_sensor_update()) {
+			uint16_t distance = ultrasonic_sensor_get_distance();
+			buzzer_update_frequency_for_distance(distance);
+			ultrasonic_sensor_clear_update_flag();
+		}
+
 		if (millis >= 250) {
 			millis = 0;
 			
@@ -46,12 +52,6 @@ int main()
 			// USART0_print(usart_buffer);
 
 			ultrasonic_sensor_trigger();
-
-			uint16_t distance = ultrasonic_sensor_get_distance();
-			buzzer_update_frequency_for_distance(distance);
-
-			sprintf(usart_buffer, "%u\r\n", distance);
-			USART0_print(usart_buffer);
 		}
 	}
 

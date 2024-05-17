@@ -15,6 +15,17 @@ void ultrasonic_sensor_init_gpio();
 void ultrasonic_sensor_trigger();
 
 /**
+ * Returns true if the distance updated flag is set
+*/
+bool ultrasonic_sensor_update();
+
+/**
+ * Clears the distance_updated flag
+ * (this should be called after getting the distance)
+*/
+void ultrasonic_sensor_clear_update_flag();
+
+/**
  * Computes distance based on signal travel time
 */
 uint16_t ultrasonic_sensor_get_distance();

@@ -1,9 +1,11 @@
+#include <stdbool.h>
 #include <avr/io.h>
 #include <util/delay.h>
 
 #include "ultrasonic_sensor.h"
 
 extern volatile uint16_t ultrasonic_sensor_micros;
+extern bool distance_updated;
 
 void ultrasonic_sensor_init_gpio()
 {
@@ -27,7 +29,17 @@ void ultrasonic_sensor_trigger()
 	TCNT1 = 0;
 }
 
+void ultrasonic_sensor_clear_update_flag()
+{
+    distance_updated = false;
+}
+
 uint16_t ultrasonic_sensor_get_distance()
 {
     return (ultrasonic_sensor_micros * .0343) / 2;
+}
+
+bool ultrasonic_sensor_update()
+{
+    return distance_updated;
 }
