@@ -1,7 +1,16 @@
 #include <stdio.h>
+#include <stdbool.h>
+
 #include <avr/io.h>
+#include <avr/interrupt.h>
 
 #include "usart.h"
+
+#define USART_BUFFER_MAX_LEN 64
+
+static volatile char usart_buffer[USART_BUFFER_MAX_LEN];
+static volatile size_t usart_buffer_len = 0;
+static volatile bool string_received = false;
 
 void USART0_init(unsigned int ubrr)
 {
@@ -10,10 +19,12 @@ void USART0_init(unsigned int ubrr)
     UBRR0L = (unsigned char)ubrr;
 
     /* enable TX and RX */
-    UCSR0B = (1<<RXEN0) | (1<<TXEN0);
+    UCSR0B = _BV(RXEN0) | _BV(TXEN0);
+    // enable receive complete interrupt
+    UCSR0B |= _BV(RXCIE0);
 
     /* frame format: 8 bits, 2 stop, no parity */
-    UCSR0C = (1<<USBS0) | (3<<UCSZ00);
+    UCSR0C = _BV(USBS0) | (3<<UCSZ00);
 }
 
 void USART0_transmit(char data)
@@ -25,25 +36,37 @@ void USART0_transmit(char data)
     UDR0 = data;
 }
 
-char USART0_receive()
+bool USART0_string_received()
 {
-    /* busy wait until reception is complete */
-    while (!(UCSR0A & (1<<RXC0)));
-
-    /* the received byte is read from this register */
-    return UDR0;
+    return string_received;
 }
 
-void USART0_receive_until_newline(char *buffer)
+const char* USART0_read_buffer()
 {
-    char c;
-    do {
-        c = USART0_receive();
-        *buffer = c;
-        buffer++;
-    } while (c != '\n');
-    
-    *buffer = '\0';
+    // null terminate the usart buffer string
+    usart_buffer[usart_buffer_len] = '\0';
+    // reset buffer length
+    usart_buffer_len = 0;
+    // clear string received flag
+    string_received = false;
+
+    return (const char*) usart_buffer;
+}
+
+ISR(USART_RX_vect) {
+    // read data register into buffer and increase its length
+    uint8_t new_data = UDR0;
+    usart_buffer[usart_buffer_len++] = new_data;
+
+    // reset buffer length on overflow
+    if (usart_buffer_len >= USART_BUFFER_MAX_LEN - 1) {
+        usart_buffer_len = 0;
+    }
+
+    // set string received flag
+    if (new_data == '\n') {
+        string_received = true;
+    }
 }
 
 void USART0_print(const char *str)
@@ -51,4 +74,10 @@ void USART0_print(const char *str)
     while (*str != '\0') {
         USART0_transmit(*str++);
     }
+}
+
+void USART0_print_crlf(const char *str)
+{
+    USART0_print(str);
+    USART0_print("\r\n");
 }

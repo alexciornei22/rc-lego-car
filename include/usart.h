@@ -18,18 +18,16 @@ void USART0_init(unsigned int ubrr);
 void USART0_transmit(char data);
 
 /*
- * Receives a byte from USART.
- *
- * @return the data byte received;
+ * Returns the value of the string received flag
  */
-char USART0_receive();
+bool USART0_string_received();
 
-/*
- * Receives a line from USART.
- *
- * @return the data received;
- */
-void USART0_receive_until_newline(char *buffer);
+/**
+ * Returns a pointer to the start of the receive buffer string,
+ * RESETS buffer length to 0,
+ * CLEARS string received flag
+*/
+const char* USART0_read_buffer();
 
 /*
  * Trasmits a null-terminated string through the USART.
@@ -37,5 +35,13 @@ void USART0_receive_until_newline(char *buffer);
  * @param str: the string to send
  */
 void USART0_print(const char *str);
+
+/**
+ * Trasmits a null-terminated string 
+ * appended with "\\r\\n" through the USART.
+ *
+ * @param str: the string to send
+ */
+void USART0_print_crlf(const char *str);
 
 #endif // USART_H_

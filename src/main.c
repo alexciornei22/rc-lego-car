@@ -29,10 +29,8 @@ int main()
 	init_bluetooth_conn_led();
 	adc_init();
 
-	USART0_print("AT+NAMELEGO-CAR\r\n");
-	USART0_print("AT+NLLEGO-CAR\r\n");
-
-	char usart_buffer[30];
+	USART0_print_crlf("AT+NAMELEGO-CAR");
+	USART0_print_crlf("AT+NLLEGO-CAR");
 
 	while (1) {
 
@@ -47,11 +45,14 @@ int main()
 		if (millis >= 250) {
 			millis = 0;
 			
-			// uint16_t result = adc_get_light_value();
-			// sprintf(usart_buffer, "%u %u\r\n", result, millis);
-			// USART0_print(usart_buffer);
+			uint16_t result = adc_get_light_value();
 
 			ultrasonic_sensor_trigger();
+		}
+
+		if (USART0_string_received()) {
+			const char* buffer = USART0_read_buffer();
+			USART0_print(buffer);
 		}
 	}
 
