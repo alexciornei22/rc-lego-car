@@ -4,6 +4,15 @@
 /**
  * Set bluetooth connection indicator LED pin as output
 */
-void init_bluetooth_conn_led();
+void leds_init();
+
+void bluetooth_conn_led_enable();
+void bluetooth_conn_led_disable();
+
+void headlights_enable();
+void headlights_disable();
+
+void hazardlights_enable();
+void hazardlights_disable();
 
 #endif // LEDS_H_

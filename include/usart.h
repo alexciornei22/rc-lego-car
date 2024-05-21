@@ -1,6 +1,8 @@
 #ifndef USART_H_
 #define USART_H_
 
+#include <stdbool.h>
+
 /** Macro to compute the UBRR register from CPU frequency &
  * desired baud rate */
 #define CALC_USART_UBRR(BAUD) (F_CPU / 16 / (BAUD) - 1)

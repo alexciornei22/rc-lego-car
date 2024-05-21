@@ -4,6 +4,7 @@
 #include "usart.h"
 #include "timers.h"
 #include "leds.h"
+#include "bluetooth.h"
 #include "adc.h"
 #include "ultrasonic_sensor.h"
 #include "buzzer.h"
@@ -26,11 +27,9 @@ int main()
 	Timer1_init_input_capture();
 	Timer2_init_1Khz();
 
-	init_bluetooth_conn_led();
+	leds_init();
 	adc_init();
-
-	USART0_print_crlf("AT+NAMELEGO-CAR");
-	USART0_print_crlf("AT+NLLEGO-CAR");
+	bluetooth_init();
 
 	while (1) {
 
@@ -40,19 +39,27 @@ int main()
 			uint16_t distance = ultrasonic_sensor_get_distance();
 			buzzer_update_frequency_for_distance(distance);
 			ultrasonic_sensor_clear_update_flag();
+
+			// char buffer[30];
+			// sprintf(buffer, "Distance: %u", distance);
+			// USART0_print_crlf(buffer);
 		}
 
 		if (millis >= 250) {
 			millis = 0;
 			
 			uint16_t result = adc_get_light_value();
+			// char buffer[30];
+			// sprintf(buffer, "Light: %u", result);
+			// USART0_print_crlf(buffer);
 
 			ultrasonic_sensor_trigger();
 		}
 
 		if (USART0_string_received()) {
-			const char* buffer = USART0_read_buffer();
+			char* buffer = USART0_read_buffer();
 			USART0_print(buffer);
+			handle_bluetooth_command(buffer);
 		}
 	}
 

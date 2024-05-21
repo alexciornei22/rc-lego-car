@@ -4,8 +4,8 @@
 
 void adc_init()
 {
-    // channel 0
-    ADMUX = 0;
+    // channel 7
+    ADMUX |= _BV(MUX0) | _BV(MUX1) | _BV(MUX2);
     // AVcc with external capacitor at AREF PIN
     ADMUX |= _BV(REFS0);
 
