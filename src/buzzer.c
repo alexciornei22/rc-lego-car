@@ -44,7 +44,7 @@ void buzzer_update_frequency_for_distance(uint16_t distance)
         return;
     }
 
-    if (distance < 20) {
+    if (distance < 18) {
         buzzer_frequency = 100;
         return;
     }
