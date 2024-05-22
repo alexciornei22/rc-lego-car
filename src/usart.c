@@ -6,8 +6,6 @@
 
 #include "usart.h"
 
-#define USART_BUFFER_MAX_LEN 64
-
 static volatile char usart_buffer[USART_BUFFER_MAX_LEN];
 static volatile size_t usart_buffer_len = 0;
 static volatile bool string_received = false;

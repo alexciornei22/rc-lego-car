@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdbool.h>
+#include <string.h>
 
 #include "usart.h"
 #include "timers.h"
@@ -57,9 +58,10 @@ int main()
 		}
 
 		if (USART0_string_received()) {
-			char* buffer = USART0_read_buffer();
-			USART0_print(buffer);
-			handle_bluetooth_command(buffer);
+			char command[USART_BUFFER_MAX_LEN];
+			strncpy(command, USART0_read_buffer(), USART_BUFFER_MAX_LEN); 
+			USART0_print(command);
+			handle_bluetooth_command(command);
 		}
 	}
 

@@ -3,6 +3,8 @@
 
 #include <stdbool.h>
 
+#define USART_BUFFER_MAX_LEN 64
+
 /** Macro to compute the UBRR register from CPU frequency &
  * desired baud rate */
 #define CALC_USART_UBRR(BAUD) (F_CPU / 16 / (BAUD) - 1)
