@@ -15,10 +15,16 @@
 #define USR_PARKING_SENSOR "PRK"
 #define USR_LIGHT_SENSOR "LIT"
 
+extern bool parking_sensor_enable;
+extern bool light_sensor_enable;
+
+
 void _handle_module_command(char *command);
 void _handle_user_command(char *command);
 
 void _handle_headlights_command(char *value_string);
+void _handle_parking_sensor_command(char *value_string);
+void _handle_light_sensor_command(char *value_string);
 
 void _trim_crlf(char *command);
 
@@ -65,6 +71,14 @@ void _handle_user_command(char *command)
     if (!strncmp(command, USR_HEADLIGHTS, USR_COMMAND_LEN)) {
         _handle_headlights_command(command + USR_COMMAND_LEN);
     }
+
+    if (!strncmp(command, USR_PARKING_SENSOR, USR_COMMAND_LEN)) {
+        _handle_parking_sensor_command(command + USR_COMMAND_LEN);
+    }
+
+    if (!strncmp(command, USR_LIGHT_SENSOR, USR_COMMAND_LEN)) {
+        _handle_light_sensor_command(command + USR_COMMAND_LEN);
+    }
 }
 
 void _handle_headlights_command(char *value_string)
@@ -75,5 +89,27 @@ void _handle_headlights_command(char *value_string)
         headlights_enable();
     } else {
         headlights_disable();
+    }
+}
+
+void _handle_parking_sensor_command(char *value_string)
+{
+    uint8_t value = atoi(value_string);
+    
+    if (value) {
+        parking_sensor_enable = true;
+    } else {
+        parking_sensor_enable = false;
+    }
+}
+
+void _handle_light_sensor_command(char *value_string)
+{
+    uint8_t value = atoi(value_string);
+    
+    if (value) {
+        light_sensor_enable = true;
+    } else {
+        light_sensor_enable = false;
     }
 }

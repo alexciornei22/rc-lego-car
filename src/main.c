@@ -11,10 +11,12 @@
 #include "buzzer.h"
 
 #define BAUD_RATE 9600
+#define LIGHT_THRESHOLD 500
 
 extern volatile uint16_t millis;
 
-bool light_low = false;
+bool parking_sensor_enable = false;
+bool light_sensor_enable = false;
 
 int main()
 {
@@ -34,7 +36,11 @@ int main()
 
 	while (1) {
 
-		buzzer_use();
+		if (parking_sensor_enable) {
+			buzzer_use();
+		} else {
+			buzzer_turn_off();
+		}
 
 		if (ultrasonic_sensor_update()) {
 			uint16_t distance = ultrasonic_sensor_get_distance();
@@ -49,10 +55,14 @@ int main()
 		if (millis >= 250) {
 			millis = 0;
 			
-			uint16_t result = adc_get_light_value();
-			// char buffer[30];
-			// sprintf(buffer, "Light: %u", result);
-			// USART0_print_crlf(buffer);
+			if (light_sensor_enable) {
+				uint16_t light_value = adc_get_light_value();
+				if (light_value < LIGHT_THRESHOLD) {
+					headlights_enable();
+				} else {
+					headlights_disable();
+				}
+			}
 
 			ultrasonic_sensor_trigger();
 		}

@@ -16,15 +16,13 @@ void leds_init()
     DDRB |= _BV(BLUETOOTH_LED);
     PORTB &= ~_BV(BLUETOOTH_LED);
 
-    // set car lights to output and set LOW
+    // set car lights to output
     DDRC |= _BV(HEADLIGHT0);
     DDRC |= _BV(HEADLIGHT1);
     DDRC |= _BV(HAZARDLIGHT0);
     DDRC |= _BV(HAZARDLIGHT1);
-    PORTC &= ~_BV(HEADLIGHT0);
-    PORTC &= ~_BV(HEADLIGHT1);
-    PORTC &= ~_BV(HAZARDLIGHT0);
-    PORTC &= ~_BV(HAZARDLIGHT1);
+    headlights_disable();
+    hazardlights_disable();
 }
 
 void bluetooth_conn_led_enable()
@@ -37,25 +35,25 @@ void bluetooth_conn_led_disable()
     PORTB &= ~_BV(BLUETOOTH_LED);
 }
 
-void headlights_enable()
+void headlights_disable()
 {
     PORTC |= _BV(HEADLIGHT0);
     PORTC |= _BV(HEADLIGHT1);
 }
 
-void headlights_disable()
+void headlights_enable()
 {
     PORTC &= ~_BV(HEADLIGHT0);
     PORTC &= ~_BV(HEADLIGHT1);
 }
 
-void hazardlights_enable()
+void hazardlights_disable()
 {
     PORTC |= _BV(HAZARDLIGHT0);
     PORTC |= _BV(HAZARDLIGHT1);
 }
 
-void hazardlights_disable()
+void hazardlights_enable()
 {
     PORTC &= ~_BV(HAZARDLIGHT0);
     PORTC &= ~_BV(HAZARDLIGHT1);
