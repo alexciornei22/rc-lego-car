@@ -14,6 +14,7 @@
 #define LIGHT_THRESHOLD 500
 
 extern volatile uint16_t millis;
+extern bool hazards_on;
 
 bool parking_sensor_enable = false;
 bool light_sensor_enable = false;
@@ -26,7 +27,7 @@ int main()
 	ultrasonic_sensor_init_gpio();
 	buzzer_init_gpio();
 
-	Timer0_init_pwm();
+	Timer0_init_phase_correct_pwm();
 	Timer1_init_input_capture();
 	Timer2_init_1Khz();
 
@@ -55,6 +56,12 @@ int main()
 		if (millis >= 250) {
 			millis = 0;
 			
+			if (hazards_on) {
+				hazardlights_toggle();
+			} else {
+				hazardlights_disable();
+			}
+
 			if (light_sensor_enable) {
 				uint16_t light_value = adc_get_light_value();
 				if (light_value < LIGHT_THRESHOLD) {
@@ -70,7 +77,7 @@ int main()
 		if (USART0_string_received()) {
 			char command[USART_BUFFER_MAX_LEN];
 			strncpy(command, USART0_read_buffer(), USART_BUFFER_MAX_LEN); 
-			USART0_print(command);
+			// USART0_print(command);
 			handle_bluetooth_command(command);
 		}
 	}

@@ -5,11 +5,14 @@
 #include "bluetooth.h"
 #include "usart.h"
 #include "leds.h"
+#include "motor.h"
 
 #define MOD_CONNECTED "+CONNECTED"
 #define MOD_DISCONNECTED "+DISCONNECTED"
 
 #define USR_COMMAND_LEN 3
+#define USR_DIRECTION "DIR"
+#define USR_THROTTLE "THR"
 #define USR_HEADLIGHTS "HDL"
 #define USR_HAZARDLIGHTS "HZL"
 #define USR_PARKING_SENSOR "PRK"
@@ -17,12 +20,16 @@
 
 extern bool parking_sensor_enable;
 extern bool light_sensor_enable;
+extern bool hazards_on;
 
 
 void _handle_module_command(char *command);
 void _handle_user_command(char *command);
 
+void _handle_direction_command(char *value_string);
+void _handle_throttle_command(char *value_string);
 void _handle_headlights_command(char *value_string);
+void _handle_hazardlights_command(char *value_string);
 void _handle_parking_sensor_command(char *value_string);
 void _handle_light_sensor_command(char *value_string);
 
@@ -68,8 +75,20 @@ void _handle_module_command(char *command)
 
 void _handle_user_command(char *command)
 {
+    if (!strncmp(command, USR_DIRECTION, USR_COMMAND_LEN)) {
+        _handle_direction_command(command + USR_COMMAND_LEN);
+    }
+
+    if (!strncmp(command, USR_THROTTLE, USR_COMMAND_LEN)) {
+        _handle_throttle_command(command + USR_COMMAND_LEN);
+    }
+
     if (!strncmp(command, USR_HEADLIGHTS, USR_COMMAND_LEN)) {
         _handle_headlights_command(command + USR_COMMAND_LEN);
+    }
+
+    if (!strncmp(command, USR_HAZARDLIGHTS, USR_COMMAND_LEN)) {
+        _handle_hazardlights_command(command + USR_COMMAND_LEN);
     }
 
     if (!strncmp(command, USR_PARKING_SENSOR, USR_COMMAND_LEN)) {
@@ -81,6 +100,24 @@ void _handle_user_command(char *command)
     }
 }
 
+void _handle_direction_command(char *value_string)
+{
+    uint8_t dir = atoi(value_string);
+
+    if (dir == 1) {
+        update_direction(FORWARDS);
+    } else {
+        update_direction(BACKWARDS);
+    }
+}
+
+void _handle_throttle_command(char *value_string)
+{
+    uint8_t value = atoi(value_string);
+    
+    update_throttle_input(value);
+}
+
 void _handle_headlights_command(char *value_string)
 {
     uint8_t value = atoi(value_string);
@@ -89,6 +126,17 @@ void _handle_headlights_command(char *value_string)
         headlights_enable();
     } else {
         headlights_disable();
+    }
+}
+
+void _handle_hazardlights_command(char *value_string)
+{
+    uint8_t value = atoi(value_string);
+    
+    if (value) {
+        hazards_on = true;
+    } else {
+        hazards_on = false;
     }
 }
 

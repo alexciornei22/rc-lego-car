@@ -4,7 +4,7 @@
 /**
  * Initialize Timer 0 (8-bit) in Fast PWM mode.
  */
-void Timer0_init_pwm();
+void Timer0_init_phase_correct_pwm();
 
 /**
  * Initialize Timer 1 (16-bit) for input capture event

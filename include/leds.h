@@ -12,7 +12,7 @@ void bluetooth_conn_led_disable();
 void headlights_enable();
 void headlights_disable();
 
-void hazardlights_enable();
+void hazardlights_toggle();
 void hazardlights_disable();
 
 #endif // LEDS_H_

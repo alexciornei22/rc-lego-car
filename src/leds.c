@@ -1,13 +1,15 @@
 #include <avr/io.h>
+#include <stdbool.h>
 
 #include "leds.h"
 
 #define BLUETOOTH_LED PB5
 
-#define HEADLIGHT0 PC0
-#define HEADLIGHT1 PC1
-#define HAZARDLIGHT0 PC2
-#define HAZARDLIGHT1 PC3
+#define HEADLIGHTS PC0
+#define SIGNAL_RIGHT PC1
+#define SIGNAL_LEFT PC2
+
+bool hazards_on = false;
 
 void leds_init()
 {
@@ -17,10 +19,10 @@ void leds_init()
     PORTB &= ~_BV(BLUETOOTH_LED);
 
     // set car lights to output
-    DDRC |= _BV(HEADLIGHT0);
-    DDRC |= _BV(HEADLIGHT1);
-    DDRC |= _BV(HAZARDLIGHT0);
-    DDRC |= _BV(HAZARDLIGHT1);
+    DDRC |= _BV(HEADLIGHTS);
+    DDRC |= _BV(SIGNAL_RIGHT);
+    DDRC |= _BV(SIGNAL_LEFT);
+
     headlights_disable();
     hazardlights_disable();
 }
@@ -37,24 +39,22 @@ void bluetooth_conn_led_disable()
 
 void headlights_disable()
 {
-    PORTC |= _BV(HEADLIGHT0);
-    PORTC |= _BV(HEADLIGHT1);
+    PORTC |= _BV(HEADLIGHTS);
 }
 
 void headlights_enable()
 {
-    PORTC &= ~_BV(HEADLIGHT0);
-    PORTC &= ~_BV(HEADLIGHT1);
+    PORTC &= ~_BV(HEADLIGHTS);
 }
 
 void hazardlights_disable()
 {
-    PORTC |= _BV(HAZARDLIGHT0);
-    PORTC |= _BV(HAZARDLIGHT1);
+    PORTC |= _BV(SIGNAL_RIGHT);
+    PORTC |= _BV(SIGNAL_LEFT);
 }
 
-void hazardlights_enable()
+void hazardlights_toggle()
 {
-    PORTC &= ~_BV(HAZARDLIGHT0);
-    PORTC &= ~_BV(HAZARDLIGHT1);
+    PORTC ^= _BV(SIGNAL_RIGHT);
+    PORTC ^= _BV(SIGNAL_LEFT);
 }

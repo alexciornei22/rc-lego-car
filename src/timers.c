@@ -9,23 +9,29 @@ volatile uint16_t buzzer_millis = 0;
 volatile uint16_t ultrasonic_sensor_micros = 0;
 volatile bool distance_updated = false;
 
-void Timer0_init_pwm()
+void Timer0_init_phase_correct_pwm()
 {
-    // set PD6(OC0A) as output
+    // set PD6(OC0A)
+    // and PD5(OC1A)
+    // as output
     DDRD |= _BV(PD6);
+    DDRD |= _BV(PD5);
 
-    // set fast PWM mode
+    // set Phase Correct PWM mode
     TCCR0A |= _BV(WGM00);
-    TCCR0A |= _BV(WGM01);
 
-    // set non-inverting mode
+    // set OC0A/OC1A when up-counting
+    // TCCR0A |= _BV(COM0A0);
     TCCR0A |= _BV(COM0A1);
+    // TCCR0A |= _BV(COM0B0);
+    TCCR0A |= _BV(COM0B1);
 
     // set 1024 prescaler
     TCCR0B |= _BV(CS00);
     TCCR0B |= _BV(CS02);
 
-    OCR0A = 127;
+    OCR0A = 0;
+    OCR0B = 0;
 }
 
 void Timer1_init_input_capture()
